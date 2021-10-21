@@ -55,13 +55,19 @@ local function parse_config(config_dict, defaults)
         elseif config_info.update_default then
             local config_value = {}
 
-            for k, v in pairs(config_info.default_value) do
-                config_value[k] = v
-            end
-
-            for k, v in pairs(config_dict[config_name]) do
-                config_value[k] = v
-            end
+            setmetatable(config_value, {
+              __index = function(table, key)
+                local user_value = config_dict[config_name][key]
+                if user_value ~= nil then
+                  table[key] = user_value
+                  return user_value
+                else
+                  local default_value = config_info.default_value[key]
+                  table[key] = default_value
+                  return default_value
+                end
+              end
+            })
 
             parsed_config[config_name] = config_value
         else
