@@ -57,15 +57,15 @@ local function parse_config(config_dict, defaults)
 
             setmetatable(config_value, {
               __index = function(table, key)
+                local value
                 local user_value = config_dict[config_name][key]
                 if user_value ~= nil then
-                  table[key] = user_value
-                  return user_value
+                  value = user_value
                 else
-                  local default_value = config_info.default_value[key]
-                  table[key] = default_value
-                  return default_value
+                  value = config_info.default_value[key]
                 end
+                table[key] = value
+                return value
               end
             })
 
