@@ -123,16 +123,16 @@ function M.use_theme(name_or_tbl)
 
     local colors = {}
 
-    -- To make sure Feline falls back to default theme for missing colors, first iterate through the
-    -- default colors and put their values in the colors table, and then iterate through the
-    -- theme colors to update the default values
-    for k, v in pairs(themes.default) do
-        colors[k] = v
-    end
-
-    for k, v in pairs(theme_colors) do
-        colors[k] = v
-    end
+    -- To make sure Feline falls back to default theme for missing colors, use a
+    -- metatable to select the default upon indexing when the provided theme
+    -- doesn't have the color.
+    setmetatable(colors, {
+      __index = function(table, key)
+        local value = theme_colors[key] or themes.default[key]
+        table[key] = value
+        return value
+      end
+    })
 
     M.colors = colors
     M.reset_highlights()
